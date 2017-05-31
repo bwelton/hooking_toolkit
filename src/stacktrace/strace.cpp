@@ -1,5 +1,5 @@
 #include "strace.h"
-
+std::shared_ptr<STrace> StraceStore;
 STrace::STrace(StraceOutpurLocation out, char * fname) {
 	switch (out) {
 		case STDOUT:
@@ -28,6 +28,11 @@ STrace::~STrace() {
 	}
 }
 
+void STrace::flush() {
+	boost::recursive_mutex::scoped_lock lock(_mtx);
+	fflush(_fd_out);
+}
+
 void STrace::LogOut(const char * fmt, ...) {
 	// Lock to ensure that output goes to file in some reasonable ordering
 	boost::recursive_mutex::scoped_lock lock(_mtx);
@@ -36,8 +41,6 @@ void STrace::LogOut(const char * fmt, ...) {
 	vfprintf(_fd_out, fmt, ap);
 	va_end(ap);
 }
-
-
 
 std::string STrace::GenStackTrace() {
 	std::stringstream ret; 	
@@ -74,3 +77,4 @@ std::string STrace::GenStackTrace() {
 	// std::cerr << ret;
 	return ret.str();
 }
+

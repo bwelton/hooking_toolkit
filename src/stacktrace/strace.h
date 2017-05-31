@@ -1,3 +1,5 @@
+#ifndef STRACE_HEADER
+#define STRACE_HEADER 1
 #include <stdio.h>
 #include <string.h>
 #include <algorithm>
@@ -46,8 +48,24 @@ private:
 public:
 	// Construct the stack trace
 	STrace(StraceOutpurLocation out, char * fname);
-
+	// Flush all output data
+	void flush();
+	// Write the stack at the current location
+	void WriteMyStack();
 	// Log output to StraceOutpurLocation, similar to printf
 	void LogOut(const char * fmt, ...);
 	~STrace();
 };
+
+extern std::shared_ptr<STrace> StraceStore;
+#define BUILD_STORAGE_CLASS_ARGS(ARG1, ARG2) \
+	if (StraceStore.get() == NULL) { \
+		fprintf(stderr, "%s\n", "Setting up our global data structure"); \
+		StraceStore.reset(new STrace(ARG1, ARG2)); \
+	} 
+
+#define BUILD_STORAGE_CLASS BUILD_STORAGE_CLASS_ARGS(STDERR, NULL);
+
+#define STORAGE_PTR StraceStore.get()
+
+#endif
