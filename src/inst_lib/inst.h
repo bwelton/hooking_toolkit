@@ -12,6 +12,8 @@
 #include <tuple>
 #include <utility> 
 #include <stdarg.h>
+#include <map>
+#include <set> 
 
 // Dyninst includes
 #include "CodeObject.h"
@@ -34,11 +36,13 @@ using namespace std;
 using namespace Dyninst;
 using namespace ParseAPI;
 using namespace PatchAPI;
+using namespace SymtabAPI;
 struct InstStorage {
+	BPatch bpatch;
 	BPatch_binaryEdit * app;
 	std::map<char *, std::pair<char *, char *>> replaceFuncs;
-	std::map<char *, std::pair<char *, char *>> wrapFunctions;
-}
+	std::map<char *, std::tuple<char *, char *, char *>> wrapFunctions;
+};
 
 
 extern "C" {
@@ -46,7 +50,7 @@ extern "C" {
 	int ReplaceFunction(InstStorage * storage, char * binary_function, char * replacement_function, 
 						char * replacement_library);
 	int WrapFunction(InstStorage * storage, char * binary_function, char * wrapper_function, 
-					 char * wrapper_library);
+					 char * wrapper_library, char * wrapper_hookName);
 	int PerformRewrite(InstStorage * storage, char * outputName);
 
 }
