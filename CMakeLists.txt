@@ -42,5 +42,6 @@ set(DYNINST_LIBRARIES "${DYNINST_LIBRARY_DIR} ${DYNINST_LIBRARY_COMMON} ${DYNINS
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
 message(${DYNINST_LIBRARIES})
 add_subdirectory(src/stacktrace)
+add_subdirectory(src/inst_lib)
 
 
