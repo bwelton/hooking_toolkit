@@ -43,5 +43,5 @@ set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
 message(${DYNINST_LIBRARIES})
 add_subdirectory(src/stacktrace)
 add_subdirectory(src/inst_lib)
-
+add_subdirectory(src/tests)
 
