@@ -52,6 +52,7 @@ std::vector<BPatch_function *> findFuncByName(BPatch_image * appImage, const cha
 
 
 int PerformRewrite(InstStorage * storage, char * outputName) {
+	fprintf(stderr, "%s %s\n", "Performing rewrite, saving to file", outputName);
 	// Gather all libraries needed and all functions we are either going to
 	// wrap or replace.
 	std::set<char *> libnames;
@@ -125,6 +126,13 @@ int PerformRewrite(InstStorage * storage, char * outputName) {
 			}
 		}
 	}
+		fprintf(stderr, "Writing output binary to %s\n", outputName);
+	if(!app->writeFile(outputName)) {
+		fprintf(stderr, "Could not write output file %s\n", outputName);
+		return -1;
+	}
+	fprintf(stderr, "Output binary written to %s\n", outputName);
+	return 0;
 }
 
 //	int PerformRewrite(char * outputName);

@@ -1,0 +1,1 @@
+replace,TestingFunction1,basic_replacefunction,@CMAKE_INSTALL_DIR@/lib/libbasic_replacelib.so
