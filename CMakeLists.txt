@@ -44,4 +44,5 @@ message(${DYNINST_LIBRARIES})
 add_subdirectory(src/stacktrace)
 add_subdirectory(src/inst_lib)
 add_subdirectory(src/tests)
-
+add_subdirectory(src/python_wrapper)
+add_subdirectory(src/scripts)

@@ -15,6 +15,8 @@ class Instrimenter(object):
 		self._storage = openBinary(c_char_p(appName))
 		if self._storage == None:
 			print "Could not open the application binary: " + appName
+			return -1
+		return 0
 
 	def ReplaceFunction(self, functionToReplace, replacementFunction, libraryWithReplacement):
 		ret = replaceFunction(self._storage, c_char_p(functionToReplace),
