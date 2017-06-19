@@ -3,10 +3,12 @@ SET(CMAKE_CXX_STANDARD 11)
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 project(hooking_toolkit)
 find_package(Boost COMPONENTS system thread REQUIRED)
+find_package(PythonLibs)
 #find_package(Dyninst COMPONENTS stackwalker)
 
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
 INCLUDE_DIRECTORIES("${CMAKE_INSTALL_PREFIX}/include")
+INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}")
 
 if (NOT DYNINST_INSTALL_DIR)
 	ExternalProject_Add(

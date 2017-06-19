@@ -30,6 +30,50 @@ int WrapFunction(InstStorage * storage, char * binary_function, char * wrapper_f
 	}
 	storage->wrapFunctions[binary_function] = std::make_tuple(wrapper_function, wrapper_library, wrapper_hookName);
 }
+PyObject * FindAllSymbolsWithPrefix(InstStorage * storage, char * prefix) {
+	BPatch_Vector<BPatch_module *> modules = *(storage->app->getImage()->getModules());
+	std::string search = std::string(prefix);
+	std::transform(search.begin(), search.end(), search.begin(), ::tolower);
+	PyObject* ret = PyList_New(0);
+	for(BPatch_module * mod : modules){
+		Dyninst::SymtabAPI::Module *symtab =  Dyninst::SymtabAPI::convert(mod);
+		std::vector<Symbol *> all_symbols;
+		symtab->getAllSymbols(all_symbols);
+		for(Symbol * sym : all_symbols) {
+			std::string tmp = sym->getPrettyName();
+			std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
+			if (tmp.find(search) != std::string::npos) {
+				PyList_Append(ret, PyString_FromString(sym->getPrettyName().c_str()));
+			}
+		} 	
+	}
+	return ret;
+}
+
+
+PyObject * GetModuleNames(InstStorage * storage) {
+	BPatch_Vector<BPatch_module *> modules = *(storage->app->getImage()->getModules());
+	PyObject* ret = PyList_New(0);
+	char tmp[200];
+	for(BPatch_module * mod : modules){
+		mod->getFullName(tmp, 200);
+		PyList_Append(ret, PyString_FromString((const char *)tmp));
+	}
+
+	return ret;
+}
+PyObject * GetBinarySymbolsForModule(InstStorage * storage, char * module_name) {
+	PyObject* ret = PyList_New(0);
+	BPatch_module * mod = storage->app->getImage()->findModule(module_name, true);
+	Dyninst::SymtabAPI::Module *symtab =  Dyninst::SymtabAPI::convert(mod);
+	std::vector<Symbol *> all_symbols;
+	symtab->getAllSymbols(all_symbols);
+	for(Symbol * sym : all_symbols) {
+		PyList_Append(ret, PyString_FromString(sym->getPrettyName().c_str()));
+	}
+	return ret;
+}
+
 
 std::vector<BPatch_function *> findFuncByName(BPatch_image * appImage, const char * funcName)
 {

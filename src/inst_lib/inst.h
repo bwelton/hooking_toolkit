@@ -32,6 +32,10 @@
 #include "BPatch_statement.h"
 #include "dynC.h"
 #include "set"
+
+// Python Includes
+#include <python2.7/Python.h>
+
 using namespace std;
 using namespace Dyninst;
 using namespace ParseAPI;
@@ -53,4 +57,7 @@ extern "C" {
 					 char * wrapper_library, char * wrapper_hookName);
 	int PerformRewrite(InstStorage * storage, char * outputName);
 
+	PyObject * GetBinarySymbolsForModule(InstStorage * storage, char * module_name);
+	PyObject * GetModuleNames(InstStorage * storage);
+	PyObject * FindAllSymbolsWithPrefix(InstStorage * storage, char * prefix);
 }
