@@ -26,6 +26,9 @@ class Instrimenter(object):
         return 0
 
     def ReplaceFunction(self, functionToReplace, replacementFunction, libraryWithReplacement):
+        print functionToReplace
+        print replacementFunction
+        print libraryWithReplacement
         ret = replaceFunction(self._storage, c_char_p(functionToReplace),
                                 c_char_p(replacementFunction), c_char_p(libraryWithReplacement))
         if (ret < 0):
@@ -56,6 +59,9 @@ class Instrimenter(object):
         return ret
 
     def InsertBeforeCall(self, functionToReplace, wrapperFunction, libraryWithWrapper):
+        print functionToReplace
+        print wrapperFunction
+        print libraryWithWrapper
         ret = insertBeforeCall(self._storage, c_char_p(functionToReplace), c_char_p(wrapperFunction), c_char_p(libraryWithWrapper))
         if ret < 0:
             print "Insert has failed " + str(functionName)

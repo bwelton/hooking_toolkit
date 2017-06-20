@@ -43,42 +43,55 @@ void STrace::LogOut(const char * fmt, ...) {
 }
 void STrace::WriteMyStack() {
 	std::string stack = GenStackTrace();
+	std::cerr << stack.c_str();
 	LogOut("%s\n", stack.c_str());
 }
 
 std::string STrace::GenStackTrace() {
-	std::stringstream ret; 	
-	std::vector<Frame> stackwalk;
-	std::string s;
-	void * sym; 
-	std::unique_ptr<Walker> walker(Walker::newWalker());
-	walker->walkStack(stackwalk);
-	Dyninst::Offset offset;
-	for (int i = 0; i < stackwalk.size(); i++) {
-		stackwalk[i].getName(s);
-		ret << s << " - ";
-		if(stackwalk[i].getLibOffset(s, offset, sym) == false){
-		 	continue;
-		}
-		Symtab * curSym = static_cast<Symtab *>(sym);
-		if (sym == NULL) {
-			std::cerr << "we dont have a symtab" << std::endl;
-			ret << "\n";
-			continue;
-		}
-		std::vector<Statement *> lines;
-		if((curSym)->getSourceLines(lines,offset) == false) {
-			ret << "\n";
-			continue;
-		}
-		for (int q = 0; q < lines.size(); q++) {
-			ret << lines[q]->getFile() << ":" << std::to_string(lines[q]->getLine()) << " ";
-			//ret << lines[i]->getFile() << " " << std::endl;// << std::to_string(lines[i]->getLine()) << std::endl;
-		}
-		// stackwalk[i].getObject(sym);
-		ret << "\n";
+	// std::stringstream ret; 	
+	void * stack[50];
+	size_t size;
+	char ** stack_strings;
+	size_t i;
+
+	size = backtrace (stack, 50);
+	stack_strings = backtrace_symbols (stack, size);
+	for (size_t i = 0; i < size; i++) {
+		ret << stack_strings << std::endl;
 	}
-	// std::cerr << ret;
+	free(stack_strings);
 	return ret.str();
+	// std::vector<Frame> stackwalk;
+	// std::string s;
+	// void * sym; 
+	// Walker * walker = Walker::newWalker();
+	// walker->walkStack(stackwalk);
+	// Dyninst::Offset offset;
+	// for (int i = 0; i < stackwalk.size(); i++) {
+	// 	stackwalk[i].getName(s);
+	// 	ret << s << " - ";
+	// 	if(stackwalk[i].getLibOffset(s, offset, sym) == false){
+	// 	 	continue;
+	// 	}
+	// 	Symtab * curSym = static_cast<Symtab *>(sym);
+	// 	if (sym == NULL) {
+	// 		std::cerr << "we dont have a symtab" << std::endl;
+	// 		ret << "\n";
+	// 		continue;
+	// 	}
+	// 	std::vector<Statement *> lines;
+	// 	if((curSym)->getSourceLines(lines,offset) == false) {
+	// 		ret << "\n";
+	// 		continue;
+	// 	}
+	// 	for (int q = 0; q < lines.size(); q++) {
+	// 		ret << lines[q]->getFile() << ":" << std::to_string(lines[q]->getLine()) << " ";
+	// 		//ret << lines[i]->getFile() << " " << std::endl;// << std::to_string(lines[i]->getLine()) << std::endl;
+	// 	}
+	// 	// stackwalk[i].getObject(sym);
+	// 	ret << "\n";
+	// }
+	// // std::cerr << ret;
+	// return ret.str();
 }
 

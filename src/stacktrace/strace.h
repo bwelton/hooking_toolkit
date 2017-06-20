@@ -14,6 +14,9 @@
 #include <tuple>
 #include <utility> 
 #include <stdarg.h>
+#include <execinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 // Dyninst includes
 #include "framestepper.h"

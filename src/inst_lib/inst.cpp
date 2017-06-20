@@ -17,7 +17,7 @@ int WrapAllFunctions(InstStorage * storage, char * binary_function, char * wrapp
 		fprintf(stderr, "%s: %s\n", "Replacment function already exists", binary_function);
 		return -1;		
 	}
-	storage->wrapAllFunctions[binary_function] = std::make_tuple(wrapper_function, wrapper_library);
+	storage->wrapAllFunctions[strdup(binary_function)] = std::make_tuple(strdup(wrapper_function), strdup(wrapper_library));
 	return 1;
 }
 
@@ -29,7 +29,7 @@ int ReplaceFunction(InstStorage * storage, char * binary_function, char * replac
 		fprintf(stderr, "%s: %s\n", "Replacment function already exists", binary_function);
 		return -1;
 	}
-	storage->replaceFuncs[binary_function] = std::make_pair(replacement_function, replacement_library);
+	storage->replaceFuncs[strdup(binary_function)] = std::make_pair(strdup(replacement_function), strdup(replacement_library));
 	return 1;
 }
 
@@ -40,7 +40,7 @@ int WrapFunction(InstStorage * storage, char * binary_function, char * wrapper_f
 		fprintf(stderr, "%s: %s\n", "Replacment function already exists", binary_function);
 		return -1;
 	}
-	storage->wrapFunctions[binary_function] = std::make_tuple(wrapper_function, wrapper_library, wrapper_hookName);
+	storage->wrapFunctions[strdup(binary_function)] = std::make_tuple(strdup(wrapper_function), strdup(wrapper_library), strdup(wrapper_hookName));
 	return 1;
 }
 
