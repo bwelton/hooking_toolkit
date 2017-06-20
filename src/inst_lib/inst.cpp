@@ -2,7 +2,7 @@
 
 InstStorage * OpenBinary(char * app_binary) {
 	InstStorage * ret = new InstStorage[1];
-
+	ret->bpatch.setInstrStackFrames(true);
 	BPatch_binaryEdit *app = ret->bpatch.openBinary(app_binary, true);
 	if (!app)
 		fprintf(stderr, "COULD NOT OPEN BINARY: %s\n", app_binary);

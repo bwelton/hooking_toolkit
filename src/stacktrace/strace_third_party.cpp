@@ -1,39 +1,56 @@
-#include "strace.h"
-std::shared_ptr<STrace> StraceStore;
-STrace::STrace(StraceOutpurLocation out, char * fname) {
-	switch (out) {
-		case STDOUT:
-			_fd_out = stdout;
-			_storage_location = STDOUT;
-			break;
-		case STDERR:
-			_fd_out = stderr;
-			_storage_location = STDERR;
-			break;
-		case TOFILE:
-			_fd_out = fopen(fname,"w");
-			if (_fd_out == NULL) {
+#include "strace_third_party.h"
+#include <boost/interprocess/shared_memory_object.hpp>
+std::shared_ptr<STraceThirdParty> StraceThird;
+
+STraceThirdParty::STraceThirdParty(StraceOutpurLocation out, char * fname) {
+	_pid = getpid();
+	if (fork() == 0) {
+		// We are the child, we are going to become the stack trace watching process.
+		switch (out) {
+			case STDOUT:
+				_fd_out = stdout;
+				_storage_location = STDOUT;
+				break;
+			case STDERR:
+				_fd_out = stderr;
 				_storage_location = STDERR;
-				LogOut("ERROR: Could not open output file, defaulting to STDERR\n");
-			} else {
-				_storage_location = TOFILE;
-			}
-			break;
+				break;
+			case TOFILE:
+				_fd_out = fopen(fname,"w");
+				if (_fd_out == NULL) {
+					_storage_location = STDERR;
+					LogOut("ERROR: Could not open output file, defaulting to STDERR\n");
+				} else {
+					_storage_location = TOFILE;
+				}
+				break;
+		}
+		ContinguousStackWalk();
+	} else {
+		return;
 	}
+
 }
 
-STrace::~STrace() {
+STraceThirdParty::~STraceThirdParty() {
 	if (_storage_location == TOFILE) {
 		fclose(_fd_out);
 	}
 }
 
-void STrace::flush() {
+void STraceThirdParty::ContinguousStackWalk() {
+	Walker * walker = Walker::newWalker(_pid);
+	ProcessState * state = walker->getProcessState();
+	
+}
+
+
+void STraceThirdParty::flush() {
 	boost::recursive_mutex::scoped_lock lock(_mtx);
 	fflush(_fd_out);
 }
 
-void STrace::LogOut(const char * fmt, ...) {
+void STraceThirdParty::LogOut(const char * fmt, ...) {
 	// Lock to ensure that output goes to file in some reasonable ordering
 	boost::recursive_mutex::scoped_lock lock(_mtx);
 	va_list ap;
@@ -41,13 +58,14 @@ void STrace::LogOut(const char * fmt, ...) {
 	vfprintf(_fd_out, fmt, ap);
 	va_end(ap);
 }
-void STrace::WriteMyStack() {
+
+void STraceThirdParty::WriteMyStack() {
 	std::string stack = GenStackTrace();
 	std::cerr << stack.c_str();
 	LogOut("%s\n", stack.c_str());
 }
 
-std::string STrace::GenStackTrace() {
+std::string STraceThirdParty::GenStackTrace() {
 	std::stringstream ret; 	
 	std::vector<Frame> stackwalk;
 	std::string s;

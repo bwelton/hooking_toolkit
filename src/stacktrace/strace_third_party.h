@@ -1,5 +1,5 @@
-#ifndef STRACE_HEADER
-#define STRACE_HEADER 1
+#ifndef STRACE_3RDP_HEADER
+#define STRACE_3RDP_HEADER 1
 #include <stdio.h>
 #include <string.h>
 #include <algorithm>
@@ -17,6 +17,9 @@
 #include <execinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <mutex>
+#include <condition_variable>
+
 
 // Dyninst includes
 #include "framestepper.h"
@@ -42,7 +45,7 @@ enum StraceOutpurLocation {
 	TOFILE = 2
 };
 
-class STrace {
+class STraceThirdParty {
 private:
 	// Lock to protect function in case of multi-thread usage;
 	boost::recursive_mutex _mtx; 
@@ -50,6 +53,7 @@ private:
 	std::string GenStackTrace();
 	StraceOutpurLocation _storage_location; 
 	FILE * _fd_out;
+	int _pid;
 public:
 	// Construct the stack trace
 	STrace(StraceOutpurLocation out, char * fname);
@@ -62,15 +66,15 @@ public:
 	~STrace();
 };
 
-extern std::shared_ptr<STrace> StraceStore;
+extern std::shared_ptr<STraceThirdParty> StraceThird;
 #define BUILD_STORAGE_CLASS_ARGS(ARG1, ARG2) \
-	if (StraceStore.get() == NULL) { \
+	if (StraceThird.get() == NULL) { \
 		fprintf(stderr, "%s\n", "Setting up our global data structure"); \
-		StraceStore.reset(new STrace(ARG1, ARG2)); \
+		StraceThird.reset(new STrace(ARG1, ARG2)); \
 	} 
 
 #define BUILD_STORAGE_CLASS BUILD_STORAGE_CLASS_ARGS(STDERR, NULL);
 
-#define STORAGE_PTR StraceStore.get()
+#define STORAGE_PTR StraceThird.get()
 
 #endif
