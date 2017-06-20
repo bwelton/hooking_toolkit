@@ -41,6 +41,10 @@ void STrace::LogOut(const char * fmt, ...) {
 	vfprintf(_fd_out, fmt, ap);
 	va_end(ap);
 }
+void STrace::WriteMyStack() {
+	std::string stack = GenStackTrace();
+	LogOut("%s\n", stack.c_str());
+}
 
 std::string STrace::GenStackTrace() {
 	std::stringstream ret; 	

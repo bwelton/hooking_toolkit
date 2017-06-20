@@ -9,6 +9,18 @@ InstStorage * OpenBinary(char * app_binary) {
 	ret->app = app;
 	return ret;
 }
+
+int WrapAllFunctions(InstStorage * storage, char * binary_function, char * wrapper_function, 
+				 char * wrapper_library) {
+	assert(storage != NULL);
+	if (storage->wrapAllFunctions.find(binary_function) != storage->wrapAllFunctions.end()) {
+		fprintf(stderr, "%s: %s\n", "Replacment function already exists", binary_function);
+		return -1;		
+	}
+	storage->wrapAllFunctions[binary_function] = std::make_tuple(wrapper_function, wrapper_library);
+	return 1;
+}
+
 int ReplaceFunction(InstStorage * storage, char * binary_function, char * replacement_function, 
 					char * replacement_library) {
 
@@ -29,7 +41,9 @@ int WrapFunction(InstStorage * storage, char * binary_function, char * wrapper_f
 		return -1;
 	}
 	storage->wrapFunctions[binary_function] = std::make_tuple(wrapper_function, wrapper_library, wrapper_hookName);
+	return 1;
 }
+
 PyObject * FindAllSymbolsWithPrefix(InstStorage * storage, char * prefix) {
 	BPatch_Vector<BPatch_module *> modules = *(storage->app->getImage()->getModules());
 	std::string search = std::string(prefix);
@@ -94,6 +108,25 @@ std::vector<BPatch_function *> findFuncByName(BPatch_image * appImage, const cha
   return funcs;
 }
 
+std::vector<BPatch_function *> findFuncByNameRegEx(BPatch_image * appImage, const char * funcName)
+{
+  /* fundFunctions returns a list of all functions with the name 'funcName' in the binary */
+  BPatch_Vector<BPatch_function * >funcs;
+  if (NULL == appImage->findFunction(funcName, funcs, true,false,false) || !funcs.size() || NULL == funcs[0])
+  {
+      std::cerr << "Failed to find " << funcName <<" function in the instrumentation library" << endl;
+      return std::vector<BPatch_function *>();
+  }
+  std::cerr << "Found " << funcName << " this many times " << funcs.size() << endl;
+  if (funcs.size() > 1) {
+    for(int i = 0; i < funcs.size(); i++ )
+    {
+        std::cerr << "    " << funcs[i]->getName() << std::endl;
+    }
+  }
+  return funcs;	
+
+}
 
 int PerformRewrite(InstStorage * storage, char * outputName) {
 	fprintf(stderr, "%s %s\n", "Performing rewrite, saving to file", outputName);
@@ -112,6 +145,11 @@ int PerformRewrite(InstStorage * storage, char * outputName) {
 		functions.insert(entry.first);
 		libnames.insert(std::get<1>(entry.second));
 	}
+
+	for(auto const & entry : storage->wrapAllFunctions) {
+		libnames.insert(std::get<1>(entry.second));
+	}
+
 
 	for (const char * lname : libnames) {
 		fprintf(stderr, "%s %s %s\n", "Inserting library", lname, "into binary");
@@ -167,10 +205,41 @@ int PerformRewrite(InstStorage * storage, char * outputName) {
 				if (found == false) {
 					fprintf(stderr, "%s: %s\n", "Could not find the wrapper function symbol for" , wrapName.c_str());
 				}
+			} 
+		}
+	}
+
+	// Replace all functions by Prefix
+	char * bin_func;
+	char * wrap_func; 
+	char * wrap_lib;
+	for (auto wrap_all : storage->wrapAllFunctions) {
+		std::tie(wrap_func, wrap_lib) = wrap_all.second;
+		std::vector<BPatch_function *> rep_funcs = findFuncByName(appImage, wrap_func);
+		if (rep_funcs.size() == 0) {
+			fprintf(stderr, "%s: %s\n", "Could not find the function", wrap_func);
+			break;
+		}
+		if (rep_funcs.size() > 1) {
+			fprintf(stderr, "%s: %s\n", "We found more than one of the following wrapper function", wrap_func);
+			fprintf(stderr, "%s\n", "You may (and likely will) get undesired results....");
+		}			
+		bin_func = (char *) wrap_all.first;
+		BPatch_funcCallExpr beforeExec(*(rep_funcs[0]),  std::vector<BPatch_snippet*>());
+
+		fprintf(stderr, "Trying to replace all with the following regex: %s\n", bin_func);
+		std::vector<BPatch_function *> reps = findFuncByNameRegEx(appImage, (const char*)bin_func);
+		for (BPatch_function * inst_f : reps) {
+			BPatch_Vector<BPatch_point *> entry_points;
+			inst_f->getEntryPoints(entry_points);
+			if (!app->insertSnippet(beforeExec, entry_points)){
+				fprintf(stderr, "%s %s %s %s\n", "Could not insert ", wrap_func, " before call ", bin_func);
 			}
 		}
 	}
-		fprintf(stderr, "Writing output binary to %s\n", outputName);
+
+
+	fprintf(stderr, "Writing output binary to %s\n", outputName);
 	if(!app->writeFile(outputName)) {
 		fprintf(stderr, "Could not write output file %s\n", outputName);
 		return -1;

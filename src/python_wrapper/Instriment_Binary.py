@@ -5,7 +5,7 @@ from PyInstriment import *
 def PrintDescFileFormat():
     print "Use the following format for the description file:" 
     print "<Type>,<OriginalFunc>,<Replacement/WrapperFuncName>,<LibraryWithReplacement/Wrapper>,<OrignalCallname>\\n"
-    print "Type = Wrap or Replace"
+    print "Type = Wrap,Replace,InsertBeforeAll (All specifies if prefix matching will be used)"
     print "OriginalFunc = Name of the function to wrap/replace"
     print "Replacement/WrapperFuncname = Name of the replacement/wrapper function."
     print "LibraryWithReplacement/Wrapper = The full path to the libary (.so file)" 
@@ -62,6 +62,15 @@ for x in data:
             exit(-1)
         print "Replacing function: " + tmp[1] + " with " + tmp[2]
         inst.ReplaceFunction(tmp[1],tmp[2],tmp[3])
+    elif tmp[0].lower() == "insertbeforeall":
+        if len(tmp) != 4:
+            print "Incorrect number of arguements to insert a function call, expect 4 arguments"
+            PrintDescFileFormat()
+            print x
+            exit(-1)
+        print "Inserting " + tmp[2] + " before function call " + tmp[1]
+        print tmp
+        inst.InsertBeforeCall(tmp[1],tmp[2],tmp[3])        
 
 inst.PerformRewrite(sys.argv[3])
 
