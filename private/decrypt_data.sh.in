@@ -5,6 +5,6 @@ rm -f @PROJECT_SOURCE_DIR@/private/key.bin
 rm -rf @PROJECT_SOURCE_DIR@/private/src
 openssl rsautl -decrypt -out @PROJECT_SOURCE_DIR@/private/key.bin -in @PROJECT_SOURCE_DIR@/private/key.bin.enc -inkey ~/.ssh/privrepo
 openssl enc -d -aes-256-cbc -in @PROJECT_SOURCE_DIR@/private/enc_data -out @PROJECT_SOURCE_DIR@/private/tmp.tar.gz -pass file:./key.bin
-tar xvf @PROJECT_SOURCE_DIR@/private/tmp.tar.gz
-
+tar xmvf @PROJECT_SOURCE_DIR@/private/tmp.tar.gz
+ 
 
