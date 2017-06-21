@@ -1,5 +1,9 @@
 #!/bin/bash
 cd @PROJECT_SOURCE_DIR@/private
 rm -f @PROJECT_SOURCE_DIR@/private/tmp.tar.gz
+rm -f @PROJECT_SOURCE_DIR@/private/key.bin
+rm -f @PROJECT_SOURCE_DIR@/private/key.bin.enc
 tar -zcvf @PROJECT_SOURCE_DIR@/private/tmp.tar.gz ./src 
-openssl rsautl -pubin -encrypt -in @PROJECT_SOURCE_DIR@/private/tmp.tar.gz -out @PROJECT_SOURCE_DIR@/private/enc_data -inkey ~/.ssh/privrepo.pub.pem
+openssl rand -base64 64 > key.bin
+openssl rsautl -encrypt -pubin -in key.bin -out key.bin.enc -inkey ~/.ssh/privrepo.pub.pem
+openssl enc -aes-256-cbc -salt -in @PROJECT_SOURCE_DIR@/private/tmp.tar.gz  -out @PROJECT_SOURCE_DIR@/private/enc_data -pass file:./key.bin
