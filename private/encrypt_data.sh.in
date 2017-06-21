@@ -1,0 +1,5 @@
+#!/bin/bash
+cd @PROJECT_SOURCE_DIR@/private
+rm -f @PROJECT_SOURCE_DIR@/private/tmp.tar.gz
+tar -zcvf @PROJECT_SOURCE_DIR@/private/tmp.tar.gz ./src 
+openssl rsautl -pubin -encrypt -in @PROJECT_SOURCE_DIR@/private/tmp.tar.gz -out @PROJECT_SOURCE_DIR@/private/enc_data -inkey ~/.ssh/privrepo.pub.pem

@@ -1,0 +1,8 @@
+#!/bin/bash
+rm -f @PROJECT_SOURCE_DIR@/private/tmp.tar.gz
+rm -rf @PROJECT_SOURCE_DIR@/private/src
+openssl rsautl -decrypt -out @PROJECT_SOURCE_DIR@/private/tmp.tar.gz -in @PROJECT_SOURCE_DIR@/private/enc_data -inkey ~/.ssh/privrepo
+cd @PROJECT_SOURCE_DIR@/private
+tar xvf @PROJECT_SOURCE_DIR@/private/tmp.tar.gz
+
+
