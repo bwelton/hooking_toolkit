@@ -44,7 +44,7 @@ void STrace::LogOut(const char * fmt, ...) {
 void STrace::WriteMyStack() {
 	std::string stack = GenStackTrace();
 	std::cerr << stack.c_str();
-	LogOut("%s\n", stack.c_str());
+	LogOut("===================\nTrace:\n%s\n=================\n", stack.c_str());
 }
 
 std::string STrace::GenStackTrace() {

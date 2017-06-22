@@ -69,7 +69,7 @@ extern std::shared_ptr<STrace> StraceStore;
 		StraceStore.reset(new STrace(ARG1, ARG2)); \
 	} 
 
-#define BUILD_STORAGE_CLASS BUILD_STORAGE_CLASS_ARGS(STDERR, NULL);
+#define BUILD_STORAGE_CLASS BUILD_STORAGE_CLASS_ARGS(TOFILE, "progtraces.txt");
 
 #define STORAGE_PTR StraceStore.get()
 
