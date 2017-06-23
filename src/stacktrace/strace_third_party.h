@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <mutex>
 #include <condition_variable>
+#include "PCProcess.h"
+#include <signal.h>
 
 
 // Dyninst includes
@@ -32,9 +34,11 @@
 #include "Symtab.h"
 #include "BPatch.h"
 #include "BPatch_process.h"
+#include "BPatch_function.h"
 using namespace Dyninst;
 using namespace Dyninst::Stackwalker;
 using namespace SymtabAPI;
+using namespace std;
 
 // Boost locking
 #include <boost/thread/recursive_mutex.hpp>
@@ -48,32 +52,42 @@ enum StraceOutpurLocation {
 class STraceThirdParty {
 private:
 	// Lock to protect function in case of multi-thread usage;
-	boost::recursive_mutex _mtx; 
+	//boost::recursive_mutex _mtx; 
 	// Generate first party stack trace at the current location
 	std::string GenStackTrace();
 	StraceOutpurLocation _storage_location; 
 	FILE * _fd_out;
 	int _pid;
+	BPatch bpatch;
+	std::map<size_t, std::string> _storedStacks;
+
 public:
 	// Construct the stack trace
-	STrace(StraceOutpurLocation out, char * fname);
+	STraceThirdParty();
+	STraceThirdParty(StraceOutpurLocation out, char * fname);
+	void WriteStacks();
+	void waitUntilStopped(BPatch *bpatch, BPatch_process *appProc, int proc_id);
+	std::vector<std::string> GenStackTrace(BPatch *bpatch, BPatch_process *appProc, int proc_id);
+	void AddTrace(std::string i);
 	// Flush all output data
 	void flush();
-	// Write the stack at the current location
-	void WriteMyStack();
 	// Log output to StraceOutpurLocation, similar to printf
 	void LogOut(const char * fmt, ...);
-	~STrace();
+	~STraceThirdParty();
 };
 
 extern std::shared_ptr<STraceThirdParty> StraceThird;
 #define BUILD_STORAGE_CLASS_ARGS(ARG1, ARG2) \
 	if (StraceThird.get() == NULL) { \
 		fprintf(stderr, "%s\n", "Setting up our global data structure"); \
-		StraceThird.reset(new STrace(ARG1, ARG2)); \
+		StraceThird.reset(new STraceThirdParty(ARG1, ARG2)); \
 	} 
 
-#define BUILD_STORAGE_CLASS BUILD_STORAGE_CLASS_ARGS(STDERR, NULL);
+#define BUILD_STORAGE_CLASS \
+	if (StraceThird.get() == NULL) { \
+		fprintf(stderr, "%s\n", "Setting up our global data structure"); \
+		StraceThird.reset(new STraceThirdParty()); \
+	} 
 
 #define STORAGE_PTR StraceThird.get()
 

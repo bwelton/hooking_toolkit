@@ -1,2 +1,1 @@
-replace,TestingFunction1,basic_replacefunction,@CMAKE_INSTALL_PREFIX@/lib/libbasic_replacelib.so
-insertbeforeall,TestingFunction2,STRACE_RECORD_STACKTRACE,@CMAKE_INSTALL_PREFIX@/lib/libstrace.so
+replace,TestingFunction1,STRACE_RECORD_STACKTRACE,@CMAKE_INSTALL_PREFIX@/lib/libstrace_third_party.so

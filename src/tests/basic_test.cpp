@@ -12,6 +12,11 @@ int TestingFunction2(void) {
 }
 
 int main(int argc, char * argv[]){
+	fprintf(stderr, "%s\n", "Calling TestingFunction1");
+	TestingFunction1();
+	fprintf(stderr, "%s\n", "Calling TestingFunction1");
+	TestingFunction1();
+	fprintf(stderr, "%s\n", "Calling TestingFunction1");
 	TestingFunction1();
 	if (TestingFunction2() != EXPECTED_RETURN + 1) {
 		fprintf(stderr, "%s\n", "Wrapper function not called");
