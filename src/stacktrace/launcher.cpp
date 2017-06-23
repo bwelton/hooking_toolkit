@@ -1,5 +1,5 @@
-#include "strace_third_party.h"
-std::shared_ptr<STraceThirdParty> StraceThird;
+#include "StraceThirdPartyLauncher.h"
+std::shared_ptr<STraceThirdPartyLauncher> StraceThirdLaunch;
 
 std::vector<BPatch_function *> findFuncByName(BPatch_image * appImage, const char * funcName)
 {
