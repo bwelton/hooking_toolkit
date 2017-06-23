@@ -40,8 +40,9 @@ using namespace Dyninst::Stackwalker;
 using namespace SymtabAPI;
 using namespace std;
 
+
 // Boost locking
-#include <boost/thread/recursive_mutex.hpp>
+//#include <boost/thread/recursive_mutex.hpp>
 
 enum StraceOutpurLocation {
 	STDOUT = 0, 
