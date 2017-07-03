@@ -1,6 +1,8 @@
 #include "strace.h"
+#include <pthread.h>
 std::shared_ptr<STrace> StraceStore;
 STrace::STrace(StraceOutpurLocation out, char * fname) {
+        pthread_self();
 	switch (out) {
 		case STDOUT:
 			_fd_out = stdout;

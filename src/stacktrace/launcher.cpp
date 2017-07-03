@@ -33,7 +33,7 @@ static void handle_signal (int sig, siginfo_t *siginfo, void *context)
 	}
 	fprintf(stderr, "%s\n", "TRACER: Attached to process");
 	BPatch_image * appImage = proc->getImage();
-	std::vector<BPatch_function *> rep_funcs = findFuncByName(appImage, "STRACE_RECORD_STACKTRACE");
+	std::vector<BPatch_function *> rep_funcs = findFuncByName(appImage, "STRACE_MY_HOOK_LOC"); // "STRACE_RECORD_STACKTRACE"
 	BPatch_Vector<BPatch_point *> points;
 	rep_funcs[0]->getEntryPoints(points);
 	BPatch_breakPointExpr bp;

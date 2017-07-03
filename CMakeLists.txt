@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 2.8.11)
 SET(CMAKE_CXX_STANDARD 11)
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 project(hooking_toolkit)
+
 find_package(Boost COMPONENTS system thread REQUIRED)
 find_package(PythonLibs)
 #find_package(Dyninst COMPONENTS stackwalker)
@@ -13,13 +14,14 @@ INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}")
 if (NOT DYNINST_INSTALL_DIR)
 	ExternalProject_Add(
 	  dyninst
-	  GIT_REPOSITORY "https://github.com/dyninst/dyninst.git"
-	  #GIT_TAG "a8252fd9ace7dd837f98b0db750c588560feea95"
+	  GIT_REPOSITORY "https://github.com/bwelton/dyninst.git"
+	  #GIT_REPOSITORY "https://github.com/dyninst/dyninst.git"
+          #GIT_TAG "a8252fd9ace7dd837f98b0db750c588560feea95"
 	  SOURCE_DIR "${PROJECT_BINARY_DIR}/3rdparty/dyninst"
-	  CMAKE_ARGS -DSHOULD_INSTALL_LIBELF=Yes -DBOOST_ROOT=${Boost_ROOT} -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+	  CMAKE_ARGS -DLIBDWARF_LIBRARIES=/sw/xk6/libdwarf/20130729-b/cle5.2_gnu4.8.2/lib/libdwarf.so -DLIBDWARF_INCLUDE_DIR=/sw/xk6/libdwarf/20130729-b/cle5.2_gnu4.8.2/include -DLIBELF_LIBRARIES=${CMAKE_SOURCE_DIR}/build/libelf_tmp/lib/libelf_pic.a -DLIBELF_INCLUDE_DIR=${CMAKE_SOURCE_DIR}/build/libelf_tmp/include -DBOOST_ROOT=${BOOST_ROOT} -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
 	  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
 	  BUILD_COMMAND $(MAKE) -j 32
-	  UPDATE_COMMAND ""
+	  #UPDATE_COMMAND ""
 	)  
 	set(DYNINST_LIBRARY_DIR "-L${CMAKE_INSTALL_PREFIX}/lib")
 else()

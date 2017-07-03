@@ -73,7 +73,7 @@ void STraceThirdPartyLauncher::waitUntilStopped(BPatch *bpatch, BPatch_process *
       }
       if (appProc->isTerminated())
         break;
-    count++;
+      count++;
       fprintf(stderr, "%s\n", "Process has returned from being stopped");
       std::vector<std::string> ret = GenStackTrace(bpatch, appProc, proc_id);
       for(auto i : ret) {
