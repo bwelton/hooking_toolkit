@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8.11)
 SET(CMAKE_CXX_STANDARD 11)
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 project(hooking_toolkit)
-
+set(BOOST_ROOT ${BOOST_ROOT})
 find_package(Boost COMPONENTS system thread REQUIRED)
 find_package(PythonLibs)
 #find_package(Dyninst COMPONENTS stackwalker)

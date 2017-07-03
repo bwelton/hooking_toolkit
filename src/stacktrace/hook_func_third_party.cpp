@@ -7,7 +7,7 @@ extern "C" {
 		// BUILD_STORAGE_CLASS_ARGS(location, fname)
 	}
 
-	void STRACE_RECORD_STACKTRACE() {
+	void HOOK_STRACE_HOOK() {
 		// We may be the first call, always check if the storage structure 
 		// has been created.
 		BUILD_STORAGE_CLASS
