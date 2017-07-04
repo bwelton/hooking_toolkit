@@ -59,11 +59,13 @@ private:
 	StraceOutpurLocation _storage_location; 
 	FILE * _fd_out;
 	int _pid;
+	BPatch_process * _proc;
 	BPatch bpatch;
 	std::map<size_t, std::string> _storedStacks;
 
 public:
 	// Construct the stack trace
+	void ContinueExec();
 	STraceThirdPartyLauncher(StraceOutpurLocation out, char * fname);
 	void WriteStacks();
 	void waitUntilStopped(BPatch *bpatch, BPatch_process *appProc, int proc_id);

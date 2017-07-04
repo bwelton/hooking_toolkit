@@ -63,7 +63,7 @@ void STraceThirdPartyLauncher::AddTrace(std::string i) {
 
 void STraceThirdPartyLauncher::waitUntilStopped(BPatch *bpatch, BPatch_process *appProc, int proc_id)
 {
-  size_t count =0;
+  size_t count = 0;
   fprintf(stderr, "%s\n", "Entering waiting loop....");
   appProc->continueExecution();
   while (!appProc->isTerminated()) {

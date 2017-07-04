@@ -1,6 +1,6 @@
 #include "StraceThirdPartyLauncher.h"
 std::shared_ptr<STraceThirdPartyLauncher> StraceThirdLaunch;
-
+static bool alreadyInstremented;
 std::vector<BPatch_function *> findFuncByName(BPatch_image * appImage, const char * funcName)
 {
   /* fundFunctions returns a list of all functions with the name 'funcName' in the binary */
@@ -23,6 +23,11 @@ std::vector<BPatch_function *> findFuncByName(BPatch_image * appImage, const cha
 static void handle_signal (int sig, siginfo_t *siginfo, void *context)
 {
 	BUILD_STORAGE_CLASS_ARGS(TOFILE, "StackTraces.txt")
+	if (alreadyInstremented == true){
+		fprintf(stderr, "%s\n", "Already instrumented this process, continuing...");
+		STORAGE_PTR->ContinueExec();
+		return;
+	}
 	BPatch bpatch;
 	fprintf(stderr,"we are here!\n");
 	int id = siginfo->si_pid;
@@ -38,12 +43,15 @@ static void handle_signal (int sig, siginfo_t *siginfo, void *context)
 	rep_funcs[0]->getEntryPoints(points);
 	BPatch_breakPointExpr bp;
 	proc->insertSnippet(bp, points);
+	alreadyInstremented = true;
 	proc->continueExecution();
+	
 	STORAGE_PTR->waitUntilStopped(&bpatch, proc, id);
 	exit(0);
 }
  
 int main(int argc, char * argv[]) {
+	alreadyInstremented = false;
 	int host_pid = getpid();
 	if (fork() == 0){
 		// we are the child, sleep for 5 seconds and spawn the process spawn the process
