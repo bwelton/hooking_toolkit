@@ -8,7 +8,7 @@ STraceThirdParty::STraceThirdParty() {
     FILE * fd_in = fopen("tp_pid.pid","r");
     fprintf(stderr, "%s\n", "File opened");
     fscanf(fd_in, "%d", &par_pid);
-    fprintf(stderr, "%s: %d\n", "Parent Process ID", par_pid);
+    fprintf(stderr, "%s: %d My PID = %d\n", "Parent Process ID", par_pid,getpid());
     fclose(fd_in);
     kill(par_pid, SIGUSR1);
     sleep(30);
