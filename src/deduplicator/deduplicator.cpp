@@ -10,6 +10,8 @@ Deduplicate::~Deduplicate() {
 
 }
 void Deduplicate::TrackTransfer(int id, int64_t size) {
+	if (id == -1)
+		return;
 	boost::recursive_mutex::scoped_lock lock(_mtx);
 	if(_previousTransfers.find(id) != _previousTransfers.end()) {
 		_collisionCount++;
