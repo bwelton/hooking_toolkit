@@ -7,6 +7,13 @@ extern "C" {
 		BUILD_STORAGE_CLASS_ARGS(location, fname)
 	}
 
+
+	void LIBRARY_HOOK_LOCATION() {
+
+		BUILD_STORAGE_CLASS
+
+		STORAGE_PTR->WriteMyStack();
+	}
 	void HOOK_STRACE_RECORD_STACKTRACE_HOOK() {
 		// We may be the first call, always check if the storage structure 
 		// has been created.

@@ -25,6 +25,7 @@ STrace::STrace(StraceOutpurLocation out, char * fname) {
 }
 
 STrace::~STrace() {
+	WriteStacks();
 	if (_storage_location == TOFILE) {
 		fclose(_fd_out);
 	}
@@ -33,6 +34,34 @@ STrace::~STrace() {
 void STrace::flush() {
 	boost::recursive_mutex::scoped_lock lock(_mtx);
 	fflush(_fd_out);
+}
+
+void STrace::WriteStacks() {
+	boost::recursive_mutex::scoped_lock lock(_mtx);
+	for (auto i : _stacks) {
+		size_t count = _stackCounts[i.first];
+		LogOut("===================== Trace ================\n==== Count = %llu\n%s\n===============\n", count, i.second.c_str());
+	}
+	_stackCounts.clear();
+	_stacks.clear();
+	flush();
+}
+
+void STrace::AddHash(std::string s) {
+	size_t b =  boost::hash_value(s);
+	boost::recursive_mutex::scoped_lock lock(_mtx);
+	if (_stacks.find(b) != _stacks.end())
+	{
+		_stackCounts[b] += 1;
+	} else {
+		_stacks[b] = s;
+		_stackCounts[b] = 1;
+	}
+	if (_stacks.size() > 100) {
+		WriteStacks();
+	}
+
+		
 }
 
 void STrace::LogOut(const char * fmt, ...) {
@@ -45,8 +74,9 @@ void STrace::LogOut(const char * fmt, ...) {
 }
 void STrace::WriteMyStack() {
 	std::string stack = GenStackTrace();
-	std::cerr << stack.c_str();
-	LogOut("===================\nTrace:\n%s\n=================\n", stack.c_str());
+	//std::cerr << stack.c_str();
+	AddHash(stack);
+	//LogOut("===================\nTrace:\n%s\n=================\n", stack.c_str());
 }
 
 std::string STrace::GenStackTrace() {

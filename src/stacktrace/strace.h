@@ -35,6 +35,7 @@ using namespace SymtabAPI;
 
 // Boost locking
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/functional/hash.hpp>
 
 enum StraceOutpurLocation {
 	STDOUT = 0, 
@@ -48,7 +49,9 @@ private:
 	boost::recursive_mutex _mtx; 
 	// Generate first party stack trace at the current location
 	std::string GenStackTrace();
-	StraceOutpurLocation _storage_location; 
+	StraceOutpurLocation _storage_location;
+	std::map<size_t, std::string> _stacks;
+	std::map<size_t, size_t> _stackCounts;
 	FILE * _fd_out;
 public:
 	// Construct the stack trace
@@ -59,6 +62,8 @@ public:
 	void WriteMyStack();
 	// Log output to StraceOutpurLocation, similar to printf
 	void LogOut(const char * fmt, ...);
+	void WriteStacks();
+	void AddHash(std::string s);
 	~STrace();
 };
 
