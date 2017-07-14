@@ -41,7 +41,9 @@ public:
 private:
 	boost::recursive_mutex _mtx; 
 	size_t _collisionCount;
-	size_t _collisionSize;
+	int64_t _collisionSize;
+        int64_t _totalSize;
+	size_t _totalCount;
 	std::map<int, int64_t> _previousTransfers; 
 	std::map<int, void *> _storedTransfers;
 
