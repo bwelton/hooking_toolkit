@@ -24,7 +24,7 @@
 
 #ifdef USE_PRIVATE
 // Cannot include this header at this time... 
-#include "xxhash64.h"
+#include "xxhash32.h"
 #endif
 
 #define TIMEOUT 10 //Timeout data after 10 successful transfers have taken place.
