@@ -44,6 +44,8 @@ void Deduplicate::TrackTransfer(int id, int64_t size, char * data) {
 			_missedHashes++;
 			_missedSize += size;
 		}
+	} else {
+	  	_previousHash[hash] = size;
 	}
 	_totalSize += size;
 	_totalCount++;	
