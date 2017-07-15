@@ -20,6 +20,13 @@
 #include <mutex>
 #include <condition_variable>
 
+#define USE_PRIVATE 1
+
+#ifdef USE_PRIVATE
+// Cannot include this header at this time... 
+#include "xxhash64.h"
+#endif
+
 #define TIMEOUT 10 //Timeout data after 10 successful transfers have taken place.
 #define MAX_DATA_SIZE_BYTES 10485760 // Maximum size of data that can be temporarily stored
 
@@ -37,7 +44,8 @@ public:
 	Deduplicate();
 	~Deduplicate();
 	void TrackTransfer(int id, int64_t size);
-
+	void TrackTransfer(int id, int64_t size, char * data);
+	uint32_t HashData(char * data, size_t size);
 private:
 	boost::recursive_mutex _mtx; 
 	size_t _collisionCount;
@@ -46,6 +54,9 @@ private:
 	size_t _totalCount;
 	std::map<int, int64_t> _previousTransfers; 
 	std::map<int, void *> _storedTransfers;
+	uint64_t _missedHashes;
+	int64_t _missedSize;
+	std::map<uint32_t, int64_t> _previousHash;
 
 };
 

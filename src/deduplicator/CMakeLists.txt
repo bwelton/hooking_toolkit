@@ -1,6 +1,10 @@
 add_library(dedup SHARED "deduplicator.cpp" "exposed_functions.cpp")
 target_link_libraries(dedup ${Boost_LIBRARIES})
 target_link_libraries(dedup "-pthread")
+if (DEFINED PRIVATE_INCLUDE)
+	INCLUDE_DIRECTORIES(${PRIVATE_INCLUDE})
+endif(DEFINED PRIVATE_INCLUDE)
+
 install(TARGETS dedup
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
