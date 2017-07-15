@@ -10,5 +10,8 @@ void TRACK_COPIES(int identifier, int64_t transfer) {
 
 }
 
+void TRACK_COPIES_DATA(int identifier, int64_t transfer, char * data) {
+
+}
 
 }
